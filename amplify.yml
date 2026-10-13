@@ -1,0 +1,16 @@
+version: 1
+applications:
+  - appRoot: .
+    frontend:
+      phases:
+        build:
+          commands:
+            # Static site — no compilation step. Node is only used for the
+            # optional pre-deploy checks; failures block a broken publish.
+            - node scripts/check-syntax.mjs
+      artifacts:
+        baseDirectory: .
+        files:
+          - '**/*'
+      cache:
+        paths: []

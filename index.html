@@ -1,0 +1,745 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#0a0d10" />
+  <meta name="description" content="GESTURA — Gesture-based User Recognition for Automobiles. A browser-based gesture-controlled car infotainment simulator. Camera inference runs locally; calls and vehicle controls are simulated." />
+  <title>GESTURA — Gesture-based User Recognition for Automobiles</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230a0d10'/%3E%3Cpath d='M8 20h16M11 16l2-6h6l2 6' stroke='%2338e0d0' stroke-width='2' fill='none' stroke-linecap='round'/%3E%3C/svg%3E" />
+  <link rel="stylesheet" href="./style.css" />
+</head>
+<body>
+
+  <!-- ================= ICON SPRITE ================= -->
+  <svg class="sprite" aria-hidden="true" focusable="false">
+    <defs>
+      <symbol id="i-home" viewBox="0 0 24 24"><path d="M3.5 10.5 12 3.5l8.5 7M6 9.8V20h4.5v-5h3v5H18V9.8"/></symbol>
+      <symbol id="i-media" viewBox="0 0 24 24"><path d="M9 18V6l10-2v12"/><circle cx="6.5" cy="18" r="2.5"/><circle cx="16.5" cy="16" r="2.5"/></symbol>
+      <symbol id="i-nav" viewBox="0 0 24 24"><path d="M12 21s6.5-6.1 6.5-11a6.5 6.5 0 1 0-13 0C5.5 14.9 12 21 12 21Z"/><circle cx="12" cy="10" r="2.4"/></symbol>
+      <symbol id="i-phone" viewBox="0 0 24 24"><path d="M6.2 3.8 8.6 4l1.5 4-1.9 1.4a12.5 12.5 0 0 0 6.4 6.4L16 14l4 1.5.2 2.4c-.1 1-1 1.8-2 1.7C10.9 19 5 13.1 4.4 5.8c-.1-1 .7-1.9 1.8-2Z"/></symbol>
+      <symbol id="i-settings" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.2"/><path d="M12 3.5v2.2M12 18.3v2.2M4.9 7.8l1.9 1.1M17.2 15.1l1.9 1.1M4.9 16.2l1.9-1.1M17.2 8.9l1.9-1.1"/></symbol>
+      <symbol id="i-back" viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></symbol>
+      <symbol id="i-chev" viewBox="0 0 24 24"><path d="M9.5 5.5 16 12l-6.5 6.5"/></symbol>
+      <symbol id="i-play" viewBox="0 0 24 24"><path d="M8 5.5v13l10.5-6.5z" fill="currentColor" stroke="none"/></symbol>
+      <symbol id="i-pause" viewBox="0 0 24 24"><path d="M8.5 5.5v13M15.5 5.5v13" stroke-width="2.6"/></symbol>
+      <symbol id="i-prev" viewBox="0 0 24 24"><path d="M17.5 6v12L9 12zM7 6v12" /></symbol>
+      <symbol id="i-next" viewBox="0 0 24 24"><path d="M6.5 6v12L15 12zM17 6v12"/></symbol>
+      <symbol id="i-stop" viewBox="0 0 24 24"><rect x="7" y="7" width="10" height="10" rx="1.6" fill="currentColor" stroke="none"/></symbol>
+      <symbol id="i-shuffle" viewBox="0 0 24 24"><path d="M4 7h3.2c4.6 0 5 8 9.6 8H20M4 15h3.2c1.6 0 2.7-.9 3.6-2.1M20 7h-3.2c-1.6 0-2.7.9-3.6 2.1M17.6 4.6 20 7l-2.4 2.4M17.6 12.6 20 15l-2.4 2.4"/></symbol>
+      <symbol id="i-repeat" viewBox="0 0 24 24"><path d="M7 5.5h9.5a3 3 0 0 1 3 3V13M17 18.5H7.5a3 3 0 0 1-3-3V11"/><path d="M5 8.6 7 6.5 5 4.4M19 15.4 17 17.5l2 2.1"/></symbol>
+      <symbol id="i-volume" viewBox="0 0 24 24"><path d="M4 9.5h3.2L12 5.8v12.4l-4.8-3.7H4zM15.5 9.2a4 4 0 0 1 0 5.6M18 7a7.4 7.4 0 0 1 0 10"/></symbol>
+      <symbol id="i-mute" viewBox="0 0 24 24"><path d="M4 9.5h3.2L12 5.8v12.4l-4.8-3.7H4zM16 10l4.5 4.5M20.5 10 16 14.5"/></symbol>
+      <symbol id="i-brightness" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 3v2.4M12 18.6V21M3 12h2.4M18.6 12H21M5.6 5.6l1.7 1.7M16.7 16.7l1.7 1.7M18.4 5.6l-1.7 1.7M7.3 16.7l-1.7 1.7"/></symbol>
+      <symbol id="i-camera" viewBox="0 0 24 24"><rect x="3" y="7" width="13" height="11" rx="2.4"/><path d="M16 11.5 21 9v7l-5-2.5z"/></symbol>
+      <symbol id="i-hand" viewBox="0 0 24 24"><path d="M9 11V5.6a1.4 1.4 0 0 1 2.8 0V11m0-1.4a1.4 1.4 0 0 1 2.8 0V12m0-1.2a1.4 1.4 0 0 1 2.8 0v4.4c0 3-2.4 5.3-5.4 5.3h-.8c-2.4 0-4.4-1.6-5.1-3.9L5 14.2a1.4 1.4 0 0 1 2.5-1.2L9 15"/></symbol>
+      <symbol id="i-mic" viewBox="0 0 24 24"><rect x="9.2" y="3.5" width="5.6" height="10.5" rx="2.8"/><path d="M6 11.5a6 6 0 0 0 12 0M12 17.5V21"/></symbol>
+      <symbol id="i-micoff" viewBox="0 0 24 24"><path d="M9.2 6.2A2.8 2.8 0 0 1 14.8 7v4M9.2 9.8v1.7a2.8 2.8 0 0 0 4.4 2.3"/><path d="M6 11.5a6 6 0 0 0 9.4 4.9M18 11.5c0 .8-.14 1.6-.4 2.3M12 17.5V21"/><path d="M4.5 4.5l15 15"/></symbol>
+      <symbol id="i-callend" viewBox="0 0 24 24"><path d="M4.4 14.6c4.6-4.4 10.6-4.4 15.2 0l-2.2 2.6-3-1.1-.5-2.3c-2-.8-4-.8-6 0l-.5 2.3-3 1.1z" fill="currentColor" stroke="none" transform="rotate(135 12 12)"/></symbol>
+      <symbol id="i-call" viewBox="0 0 24 24"><path d="M6.2 3.8 8.6 4l1.5 4-1.9 1.4a12.5 12.5 0 0 0 6.4 6.4L16 14l4 1.5.2 2.4c-.1 1-1 1.8-2 1.7C10.9 19 5 13.1 4.4 5.8c-.1-1 .7-1.9 1.8-2Z"/></symbol>
+      <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5.5v13M5.5 12h13" stroke-width="2.2"/></symbol>
+      <symbol id="i-minus" viewBox="0 0 24 24"><path d="M5.5 12h13" stroke-width="2.2"/></symbol>
+      <symbol id="i-close" viewBox="0 0 24 24"><path d="M6.5 6.5l11 11M17.5 6.5l-11 11" stroke-width="2"/></symbol>
+      <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.2"/><path d="M15.6 15.6 20.5 20.5"/></symbol>
+      <symbol id="i-bookmark" viewBox="0 0 24 24"><path d="M7 4.5h10a1 1 0 0 1 1 1V20l-6-3.4L6 20V5.5a1 1 0 0 1 1-1z"/></symbol>
+      <symbol id="i-trash" viewBox="0 0 24 24"><path d="M5 7h14M10 7V5.2a.7.7 0 0 1 .7-.7h2.6a.7.7 0 0 1 .7.7V7M7 7l.9 12.1a1 1 0 0 0 1 .9h6.2a1 1 0 0 0 1-.9L17 7"/></symbol>
+      <symbol id="i-bell" viewBox="0 0 24 24"><path d="M6.8 16.5V11a5.2 5.2 0 0 1 10.4 0v5.5l1.5 2.1H5.3zM10.2 21h3.6"/></symbol>
+      <symbol id="i-check" viewBox="0 0 24 24"><path d="M5.5 12.5 10 17l8.5-9.5" stroke-width="2.2"/></symbol>
+      <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 3v2.4M12 18.6V21M3 12h2.4M18.6 12H21M5.6 5.6l1.7 1.7M16.7 16.7l1.7 1.7M18.4 5.6l-1.7 1.7M7.3 16.7l-1.7 1.7"/></symbol>
+      <symbol id="i-moon" viewBox="0 0 24 24"><path d="M19.5 14.4A7.6 7.6 0 0 1 9.6 4.5a7.9 7.9 0 1 0 9.9 9.9z"/></symbol>
+      <symbol id="i-fan" viewBox="0 0 24 24"><circle cx="12" cy="12" r="1.9"/><path d="M12 10.1c0-3-.8-5.6-2.6-5.6S7.4 7 8.9 8.4c1.1 1 3.1 1.7 3.1 1.7zM13.9 12c3 0 5.6-.8 5.6-2.6S17 7.4 15.6 8.9c-1 1.1-1.7 3.1-1.7 3.1zM12 13.9c0 3 .8 5.6 2.6 5.6s2-2.2.5-3.7c-1.1-1-3.1-1.7-3.1-1.7zM10.1 12c-3 0-5.6.8-5.6 2.6s2.2 2 3.7.5c1-1.1 1.7-3.1 1.7-3.1z"/></symbol>
+      <symbol id="i-temp" viewBox="0 0 24 24"><path d="M10 14.2V6a2 2 0 1 1 4 0v8.2a4 4 0 1 1-4 0z"/><circle cx="12" cy="17.4" r="1.6" fill="currentColor" stroke="none"/></symbol>
+      <symbol id="i-car" viewBox="0 0 24 24"><path d="M4.5 16.5v2.2h2.6v-2.2M16.9 16.5v2.2h2.6v-2.2M4.2 16.5h15.6v-4.7l-1.7-4.4a1.6 1.6 0 0 0-1.5-1H7.4a1.6 1.6 0 0 0-1.5 1l-1.7 4.4z"/><path d="M6.5 14.2h1.6M15.9 14.2h1.6M7.8 11.6h8.4"/></symbol>
+      <symbol id="i-lock" viewBox="0 0 24 24"><rect x="5.5" y="10.5" width="13" height="9.5" rx="2"/><path d="M8.5 10.5V8a3.5 3.5 0 0 1 7 0v2.5"/><circle cx="12" cy="15.2" r="1.3" fill="currentColor" stroke="none"/></symbol>
+      <symbol id="i-unlock" viewBox="0 0 24 24"><rect x="5.5" y="10.5" width="13" height="9.5" rx="2"/><path d="M8.5 10.5V8a3.5 3.5 0 0 1 6.9-.8"/><circle cx="12" cy="15.2" r="1.3" fill="currentColor" stroke="none"/></symbol>
+      <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.4"/><path d="M12 11v5.2"/><circle cx="12" cy="8.2" r="1" fill="currentColor" stroke="none"/></symbol>
+      <symbol id="i-alert" viewBox="0 0 24 24"><path d="M12 4.6 21 19.4H3z"/><path d="M12 10v4.2"/><circle cx="12" cy="16.6" r=".9" fill="currentColor" stroke="none"/></symbol>
+      <symbol id="i-route" viewBox="0 0 24 24"><circle cx="6.5" cy="17.5" r="2.3"/><circle cx="17.5" cy="6.5" r="2.3"/><path d="M8.8 17.5H14a3.2 3.2 0 0 0 0-6.4h-4a3.2 3.2 0 0 1 0-6.4h5.2"/></symbol>
+      <symbol id="i-grid" viewBox="0 0 24 24"><rect x="4.5" y="4.5" width="6" height="6" rx="1.4"/><rect x="13.5" y="4.5" width="6" height="6" rx="1.4"/><rect x="4.5" y="13.5" width="6" height="6" rx="1.4"/><rect x="13.5" y="13.5" width="6" height="6" rx="1.4"/></symbol>
+      <symbol id="i-wave" viewBox="0 0 24 24"><path d="M2.5 12c1.6-4.7 3.2-4.7 4.8 0s3.2 4.7 4.8 0 3.2-4.7 4.8 0 3.2 4.7 4.8 0"/></symbol>
+      <symbol id="i-x-circle" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.4"/><path d="M9.4 9.4l5.2 5.2M14.6 9.4l-5.2 5.2"/></symbol>
+      <symbol id="i-list" viewBox="0 0 24 24"><path d="M8.5 7h11M8.5 12h11M8.5 17h11"/><circle cx="5" cy="7" r="1" fill="currentColor" stroke="none"/><circle cx="5" cy="12" r="1" fill="currentColor" stroke="none"/><circle cx="5" cy="17" r="1" fill="currentColor" stroke="none"/></symbol>
+      <symbol id="i-gauge" viewBox="0 0 24 24"><path d="M4.5 17.5a8.5 8.5 0 1 1 15 0"/><path d="M12 17.5 16 11"/><circle cx="12" cy="17.5" r="1.6" fill="currentColor" stroke="none"/></symbol>
+    </defs>
+  </svg>
+
+  <noscript><div class="noscript">GESTURA requires JavaScript to run.</div></noscript>
+
+  <div id="app" class="app">
+
+    <!-- ================= SYSTEM STATUS BAR ================= -->
+    <header class="statusbar" role="banner">
+      <div class="sb-group sb-left">
+        <span class="sb-brand"><svg class="ico ico-sm"><use href="#i-car"/></svg> GESTURA</span>
+        <span class="sb-chip sb-chip-vehicle" title="Simulated vehicle status — not a real vehicle">
+          <span id="sb-gear" class="sb-kv">P</span>
+          <span class="sb-sep"></span>
+          <span id="sb-speed" class="sb-kv">0 km/h</span>
+          <span class="sb-sep"></span>
+          <span id="sb-range" class="sb-kv">412 km</span>
+        </span>
+      </div>
+
+      <div class="sb-group sb-center">
+        <span id="sb-time" class="sb-time">--:--</span>
+        <span id="sb-date" class="sb-date">—</span>
+      </div>
+
+      <div class="sb-group sb-right">
+        <button id="sb-gesture" class="sb-chip sb-btn chip-off" type="button"
+                aria-label="Gesture control status. Click to open gesture controls."
+                title="Gesture control status">
+          <svg class="ico ico-sm"><use href="#i-hand"/></svg>
+          <span id="sb-gesture-text">Gestures off</span>
+        </button>
+        <span id="sb-net" class="sb-chip" title="Network status"><span class="dot dot-on"></span><span id="sb-net-text">Online</span></span>
+        <span class="sb-chip" title="Simulated battery"><svg class="ico ico-sm"><use href="#i-gauge"/></svg><span id="sb-batt-text">86%</span></span>
+        <button id="btn-diagnostics" class="sb-iconbtn" type="button" aria-label="Open diagnostics" title="Diagnostics">
+          <svg class="ico"><use href="#i-grid"/></svg>
+        </button>
+        <button id="btn-notifications" class="sb-iconbtn" type="button" aria-label="Open notifications" title="Notifications">
+          <svg class="ico"><use href="#i-bell"/></svg>
+          <span id="notif-count" class="badge-count" hidden>0</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- ================= MAIN CONTENT ================= -->
+    <main id="main" class="main" tabindex="-1">
+
+      <!-- ---------- HOME ---------- -->
+      <section id="page-home" class="page active" data-page="home" aria-label="Home dashboard">
+        <div class="dash">
+
+          <section class="widget widget-clock" data-widget="clock">
+            <div class="clock-face">
+              <div id="home-time" class="clock-time">--:--</div>
+              <div id="home-date" class="clock-date">—</div>
+              <div class="clock-sub">
+                <span id="home-temp-outer" class="pill"><svg class="ico ico-sm"><use href="#i-temp"/></svg> 24°C outside</span>
+                <span id="home-greeting" class="pill">Welcome</span>
+              </div>
+            </div>
+          </section>
+
+          <section class="widget widget-music" data-widget="music">
+            <header class="widget-head">
+              <h2><svg class="ico"><use href="#i-media"/></svg> Now Playing</h2>
+              <button class="ghost-link" type="button" data-nav-to="media">Open<svg class="ico ico-sm"><use href="#i-chev"/></svg></button>
+            </header>
+            <div id="home-music-empty" class="empty-state empty-sm" hidden>
+              <svg class="ico ico-xl"><use href="#i-media"/></svg>
+              <p>No music loaded</p>
+              <button class="btn btn-primary btn-sm" type="button" id="home-import-btn">Import music</button>
+            </div>
+            <div id="home-music-body" class="now-playing">
+              <div id="home-art" class="art art-sm"><svg class="ico"><use href="#i-media"/></svg></div>
+              <div class="np-meta">
+                <div id="home-track-title" class="np-title">—</div>
+                <div id="home-track-artist" class="np-artist">—</div>
+                <div class="np-controls">
+                  <button class="iconbtn" id="home-prev" type="button" aria-label="Previous track"><svg class="ico"><use href="#i-prev"/></svg></button>
+                  <button class="iconbtn iconbtn-accent" id="home-play" type="button" aria-label="Play or pause"><svg class="ico"><use href="#i-play"/></svg></button>
+                  <button class="iconbtn" id="home-next" type="button" aria-label="Next track"><svg class="ico"><use href="#i-next"/></svg></button>
+                </div>
+              </div>
+            </div>
+            <div class="widget-slider">
+              <svg class="ico ico-sm"><use href="#i-volume"/></svg>
+              <input id="home-volume" class="range" type="range" min="0" max="100" value="60" aria-label="Volume" />
+              <span id="home-volume-val" class="range-val">60</span>
+            </div>
+          </section>
+
+          <section class="widget widget-map" data-widget="map">
+            <header class="widget-head">
+              <h2><svg class="ico"><use href="#i-nav"/></svg> Navigation</h2>
+              <button class="ghost-link" type="button" data-nav-to="nav">Open<svg class="ico ico-sm"><use href="#i-chev"/></svg></button>
+            </header>
+            <div id="home-map" class="home-map" aria-label="Map preview"></div>
+            <div class="map-foot">
+              <span id="home-dest" class="map-dest">No destination set</span>
+              <button class="btn btn-ghost btn-sm" type="button" id="home-recenter-btn">Recenter</button>
+            </div>
+          </section>
+
+          <section class="widget widget-phone" data-widget="phone">
+            <header class="widget-head">
+              <h2><svg class="ico"><use href="#i-phone"/></svg> Phone</h2>
+              <button class="ghost-link" type="button" data-nav-to="phone">Open<svg class="ico ico-sm"><use href="#i-chev"/></svg></button>
+            </header>
+            <div id="home-contacts" class="avatar-row"></div>
+            <div id="home-recents" class="mini-list"></div>
+          </section>
+
+          <section class="widget widget-controls" data-widget="controls">
+            <header class="widget-head"><h2><svg class="ico"><use href="#i-settings"/></svg> Quick Controls</h2></header>
+            <div class="widget-slider">
+              <svg class="ico ico-sm"><use href="#i-brightness"/></svg>
+              <input id="home-brightness" class="range" type="range" min="30" max="130" value="100" aria-label="Display brightness" />
+              <span id="home-brightness-val" class="range-val">100</span>
+            </div>
+            <div class="seg" role="group" aria-label="Theme">
+              <button class="seg-btn active" type="button" data-theme="dark">Night</button>
+              <button class="seg-btn" type="button" data-theme="day">Day</button>
+              <button class="seg-btn" type="button" data-theme="auto">Auto</button>
+            </div>
+            <div class="swatch-row" role="group" aria-label="Ambient lighting colour">
+              <button class="swatch" type="button" data-ambient="#8ecbff" style="--sw:#8ecbff" aria-label="Ice Blue" title="Ice Blue"></button>
+              <button class="swatch" type="button" data-ambient="#38e0d0" style="--sw:#38e0d0" aria-label="Cyan" title="Cyan"></button>
+              <button class="swatch" type="button" data-ambient="#b98cff" style="--sw:#b98cff" aria-label="Violet" title="Violet"></button>
+              <button class="swatch" type="button" data-ambient="#3ddc97" style="--sw:#3ddc97" aria-label="Emerald" title="Emerald"></button>
+              <button class="swatch" type="button" data-ambient="#ffb457" style="--sw:#ffb457" aria-label="Amber" title="Amber"></button>
+              <button class="swatch" type="button" data-ambient="#ff5d73" style="--sw:#ff5d73" aria-label="Crimson" title="Crimson"></button>
+            </div>
+            <button class="btn btn-ghost btn-block" type="button" id="home-open-settings"><svg class="ico ico-sm"><use href="#i-settings"/></svg> Vehicle settings</button>
+          </section>
+
+          <section class="widget widget-climate" data-widget="climate">
+            <header class="widget-head"><h2><svg class="ico"><use href="#i-fan"/></svg> Climate</h2></header>
+            <div class="climate-grid">
+              <div class="climate-cell"><span class="climate-k">AC</span><span id="home-ac" class="climate-v">Off</span></div>
+              <div class="climate-cell"><span class="climate-k">Temp</span><span id="home-ac-temp" class="climate-v">22°C</span></div>
+              <div class="climate-cell"><span class="climate-k">Fan</span><span id="home-fan" class="climate-v">2</span></div>
+              <div class="climate-cell"><span class="climate-k">Seats</span><span id="home-seat" class="climate-v">Off</span></div>
+            </div>
+            <div class="climate-bar"><span id="home-climate-bar-fill" class="climate-fill"></span></div>
+            <p class="fineprint">Simulated climate — no vehicle hardware is connected.</p>
+          </section>
+
+          <section class="widget widget-status" data-widget="status">
+            <header class="widget-head"><h2><svg class="ico"><use href="#i-bell"/></svg> Status</h2></header>
+            <div class="status-rows">
+              <div class="status-row">
+                <span class="status-k"><svg class="ico ico-sm"><use href="#i-camera"/></svg> Camera</span>
+                <span id="home-camera-status" class="status-v">Off</span>
+              </div>
+              <div class="status-row">
+                <span class="status-k"><svg class="ico ico-sm"><use href="#i-hand"/></svg> Gestures</span>
+                <span id="home-gesture-status" class="status-v">Disabled</span>
+              </div>
+            </div>
+            <div class="status-actions">
+              <button class="btn btn-primary btn-sm" type="button" id="home-start-gesture">Start gesture control</button>
+              <button class="btn btn-ghost btn-sm" type="button" id="home-tutorial-btn">Gesture tutorial</button>
+            </div>
+            <ul id="home-notif-list" class="notif-mini"></ul>
+          </section>
+
+        </div>
+      </section>
+
+      <!-- ---------- MEDIA ---------- -->
+      <section id="page-media" class="page" data-page="media" aria-label="Media centre" hidden>
+        <div class="page-header">
+          <button class="back-btn" type="button" data-back aria-label="Back to home"><svg class="ico ico-lg"><use href="#i-back"/></svg></button>
+          <div class="page-title-wrap">
+            <h1 class="page-title">Media</h1>
+            <p class="page-sub">Local library — files never leave this browser</p>
+          </div>
+          <div class="page-header-actions">
+            <button class="btn btn-ghost btn-sm" type="button" id="btn-import"><svg class="ico ico-sm"><use href="#i-plus"/></svg> Import music</button>
+            <input id="file-input" type="file" accept="audio/*" multiple hidden />
+          </div>
+        </div>
+
+        <div class="page-body">
+          <div id="media-empty" class="empty-state" hidden>
+            <div class="empty-art"><svg class="ico ico-xl"><use href="#i-media"/></svg></div>
+            <h2>Your library is empty</h2>
+            <p>Import audio files from this device to build a playlist. Files are read locally as object URLs and never uploaded.</p>
+            <button class="btn btn-primary" type="button" id="btn-import-empty"><svg class="ico ico-sm"><use href="#i-plus"/></svg> Import music</button>
+            <button class="btn btn-ghost" type="button" id="btn-load-demo">Load bundled demo tracks</button>
+          </div>
+
+          <div id="media-main" class="media-grid">
+            <div class="player-card">
+              <div class="player-art-wrap">
+                <div id="media-art" class="art art-lg"><svg class="ico ico-xl"><use href="#i-media"/></svg></div>
+                <span id="media-badge" class="pill pill-dim">Stopped</span>
+              </div>
+              <div class="player-meta">
+                <h2 id="media-title" class="player-title">—</h2>
+                <p id="media-artist" class="player-artist">Select a track</p>
+
+                <div class="seek-row">
+                  <span id="media-elapsed" class="time">0:00</span>
+                  <input id="media-progress" class="range range-seek" type="range" min="0" max="100" value="0" step="0.1" aria-label="Seek position" />
+                  <span id="media-duration" class="time">0:00</span>
+                </div>
+
+                <div class="transport">
+                  <button class="iconbtn" id="btn-shuffle" type="button" aria-label="Shuffle off" aria-pressed="false" title="Shuffle"><svg class="ico"><use href="#i-shuffle"/></svg></button>
+                  <button class="iconbtn" id="btn-prev" type="button" aria-label="Previous track"><svg class="ico"><use href="#i-prev"/></svg></button>
+                  <button class="iconbtn iconbtn-accent iconbtn-lg" id="btn-play" type="button" aria-label="Play"><svg class="ico ico-lg"><use href="#i-play"/></svg></button>
+                  <button class="iconbtn" id="btn-next" type="button" aria-label="Next track"><svg class="ico"><use href="#i-next"/></svg></button>
+                  <button class="iconbtn" id="btn-repeat" type="button" aria-label="Repeat off" title="Repeat"><svg class="ico"><use href="#i-repeat"/></svg><span id="repeat-dot" class="mini-dot" hidden>1</span></button>
+                </div>
+
+                <div class="vol-row">
+                  <button class="iconbtn" id="btn-mute" type="button" aria-label="Mute"><svg class="ico"><use href="#i-volume"/></svg></button>
+                  <input id="media-volume" class="range" type="range" min="0" max="100" value="60" aria-label="Volume" />
+                  <span id="media-volume-val" class="range-val">60</span>
+                  <button class="iconbtn" id="btn-stop" type="button" aria-label="Stop playback"><svg class="ico"><use href="#i-stop"/></svg></button>
+                </div>
+
+                <div class="player-status">
+                  <span id="media-status" class="status-pill">Idle</span>
+                  <span id="media-error" class="status-pill status-err" hidden></span>
+                </div>
+              </div>
+            </div>
+
+            <div class="playlist-card">
+              <header class="card-head">
+                <h3><svg class="ico"><use href="#i-list"/></svg> Playlist</h3>
+                <div class="card-head-actions">
+                  <span id="playlist-count" class="pill pill-dim">0 tracks</span>
+                  <button class="iconbtn" id="btn-clear-playlist" type="button" aria-label="Clear playlist" title="Clear playlist"><svg class="ico"><use href="#i-trash"/></svg></button>
+                </div>
+              </header>
+              <ul id="playlist-list" class="track-list" role="listbox" aria-label="Playlist"></ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ---------- NAVIGATION ---------- -->
+      <section id="page-nav" class="page" data-page="nav" aria-label="Navigation" hidden>
+        <div class="page-header">
+          <button class="back-btn" type="button" data-back aria-label="Back to home"><svg class="ico ico-lg"><use href="#i-back"/></svg></button>
+          <div class="page-title-wrap">
+            <h1 class="page-title">Navigation</h1>
+            <p class="page-sub">OpenStreetMap — search &amp; route preview, not turn-by-turn guidance</p>
+          </div>
+          <div class="page-header-actions">
+            <button class="iconbtn" id="btn-zoom-in" type="button" aria-label="Zoom in"><svg class="ico"><use href="#i-plus"/></svg></button>
+            <button class="iconbtn" id="btn-zoom-out" type="button" aria-label="Zoom out"><svg class="ico"><use href="#i-minus"/></svg></button>
+            <button class="btn btn-ghost btn-sm" id="btn-recenter" type="button">Recenter</button>
+          </div>
+        </div>
+
+        <div class="page-body nav-layout">
+          <aside class="nav-side">
+            <div class="nav-search-card">
+              <div class="search-row">
+                <input id="nav-search" type="search" placeholder="Search a destination…" aria-label="Search destination" autocomplete="off" />
+                <button class="iconbtn" id="btn-voice" type="button" aria-label="Voice control — say a destination or command" aria-pressed="false" title="Voice control (V-sign gesture or click)"><svg class="ico"><use href="#i-mic"/></svg></button>
+                <button class="iconbtn iconbtn-accent" id="btn-nav-search" type="button" aria-label="Search"><svg class="ico"><use href="#i-search"/></svg></button>
+              </div>
+              <p id="voice-status" class="voice-status" role="status" aria-live="polite" hidden></p>
+              <p id="nav-feedback" class="nav-feedback" role="status" aria-live="polite"></p>
+              <ul id="nav-results" class="result-list"></ul>
+            </div>
+
+            <div id="nav-dest-card" class="nav-card" hidden>
+              <header class="card-head"><h3><svg class="ico"><use href="#i-nav"/></svg> Destination</h3></header>
+              <p id="nav-dest-name" class="nav-dest-name">—</p>
+              <p id="nav-dest-coords" class="fineprint">—</p>
+              <div id="nav-route-info" class="route-info" hidden>
+                <div class="route-cell"><span class="route-k">Distance</span><span id="route-distance" class="route-v">—</span></div>
+                <div class="route-cell"><span class="route-k">Drive time</span><span id="route-duration" class="route-v">—</span></div>
+              </div>
+              <div class="btn-row">
+                <button class="btn btn-primary btn-sm" id="btn-route" type="button"><svg class="ico ico-sm"><use href="#i-route"/></svg> Preview route</button>
+                <button class="btn btn-ghost btn-sm" id="btn-save-place" type="button"><svg class="ico ico-sm"><use href="#i-bookmark"/></svg> Save</button>
+                <button class="btn btn-ghost btn-sm" id="btn-clear-dest" type="button">Clear</button>
+              </div>
+            </div>
+
+            <div class="nav-card">
+              <header class="card-head"><h3><svg class="ico"><use href="#i-bookmark"/></svg> Saved places</h3></header>
+              <ul id="nav-saved" class="place-list"></ul>
+              <p id="nav-saved-empty" class="fineprint">No saved places yet.</p>
+            </div>
+
+            <div class="nav-card">
+              <header class="card-head"><h3><svg class="ico"><use href="#i-list"/></svg> Recent destinations</h3>
+                <button class="iconbtn" id="btn-clear-recent" type="button" aria-label="Clear recent destinations"><svg class="ico"><use href="#i-trash"/></svg></button>
+              </header>
+              <ul id="nav-recent" class="place-list"></ul>
+              <p id="nav-recent-empty" class="fineprint">No recent destinations.</p>
+            </div>
+          </aside>
+
+          <div class="nav-map-wrap">
+            <div id="map" class="map" aria-label="Interactive map"></div>
+            <div id="nav-map-fallback" class="map-fallback" hidden>
+              <svg class="ico ico-xl"><use href="#i-alert"/></svg>
+              <h3>Map unavailable</h3>
+              <p id="nav-map-fallback-msg">The map library or tile service could not be loaded. Check your connection — other features keep working.</p>
+              <button class="btn btn-primary btn-sm" id="btn-retry-map" type="button">Retry</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ---------- PHONE ---------- -->
+      <section id="page-phone" class="page" data-page="phone" aria-label="Phone (simulated)" hidden>
+        <div class="page-header">
+          <button class="back-btn" type="button" data-back aria-label="Back to home"><svg class="ico ico-lg"><use href="#i-back"/></svg></button>
+          <div class="page-title-wrap">
+            <h1 class="page-title">Phone <span class="sim-tag">SIMULATED</span></h1>
+            <p class="page-sub">Demo contacts and fake calls — no real telephony</p>
+          </div>
+          <div class="page-header-actions">
+            <button class="btn btn-primary btn-sm" id="btn-simulate-call" type="button"><svg class="ico ico-sm"><use href="#i-call"/></svg> Simulate incoming call</button>
+          </div>
+        </div>
+
+        <div class="page-body phone-layout">
+          <section class="phone-col">
+            <header class="card-head"><h3><svg class="ico"><use href="#i-phone"/></svg> Contacts</h3></header>
+            <div id="phone-contacts" class="contact-list"></div>
+          </section>
+
+          <section class="phone-col phone-col-mid" id="contact-detail" hidden>
+            <header class="card-head">
+              <button class="iconbtn" id="btn-contact-back" type="button" aria-label="Back to contacts"><svg class="ico"><use href="#i-back"/></svg></button>
+              <h3>Contact</h3>
+            </header>
+            <div class="contact-detail">
+              <div id="detail-avatar" class="avatar avatar-xl">?</div>
+              <h2 id="detail-name">—</h2>
+              <p id="detail-number" class="player-artist">—</p>
+              <p id="detail-note" class="fineprint">Fictional demo contact</p>
+              <div class="btn-row btn-row-center">
+                <button class="btn btn-primary" id="btn-detail-call" type="button"><svg class="ico ico-sm"><use href="#i-call"/></svg> Simulate call</button>
+              </div>
+            </div>
+          </section>
+
+          <section class="phone-col">
+            <header class="card-head">
+              <h3><svg class="ico"><use href="#i-list"/></svg> Recent calls</h3>
+              <button class="iconbtn" id="btn-clear-history" type="button" aria-label="Clear call history"><svg class="ico"><use href="#i-trash"/></svg></button>
+            </header>
+            <ul id="call-history" class="call-list"></ul>
+            <p id="call-history-empty" class="empty-inline">No calls yet — simulate one to get started.</p>
+
+            <div class="auto-card">
+              <header class="card-head"><h3><svg class="ico"><use href="#i-bell"/></svg> Auto demo calls</h3></header>
+              <p class="fineprint">Schedule recurring simulated incoming calls.</p>
+              <div class="btn-row">
+                <button class="btn btn-primary btn-sm" id="btn-auto-start" type="button">Start</button>
+                <button class="btn btn-ghost btn-sm" id="btn-auto-pause" type="button" disabled>Pause</button>
+                <button class="btn btn-ghost btn-sm" id="btn-auto-stop" type="button" disabled>Stop</button>
+              </div>
+              <p id="auto-status" class="nav-feedback">Stopped</p>
+            </div>
+          </section>
+        </div>
+      </section>
+
+      <!-- ---------- VEHICLE SETTINGS ---------- -->
+      <section id="page-settings" class="page" data-page="settings" aria-label="Vehicle settings" hidden>
+        <div class="page-header">
+          <button class="back-btn" type="button" data-back aria-label="Back to home"><svg class="ico ico-lg"><use href="#i-back"/></svg></button>
+          <div class="page-title-wrap">
+            <h1 class="page-title">Vehicle Settings <span class="sim-tag">SIMULATED</span></h1>
+            <p class="page-sub">Changes apply instantly and save locally — nothing controls real hardware</p>
+          </div>
+        </div>
+
+        <div class="page-body settings-grid">
+          <section class="set-card">
+            <header class="card-head"><h3><svg class="ico"><use href="#i-fan"/></svg> Climate</h3></header>
+            <label class="switch-row"><span>Air conditioning</span><input type="checkbox" id="set-ac" class="switch" /></label>
+            <div class="widget-slider">
+              <svg class="ico ico-sm"><use href="#i-temp"/></svg>
+              <input id="set-temp" class="range" type="range" min="16" max="30" value="22" aria-label="Temperature" />
+              <span id="set-temp-val" class="range-val">22°C</span>
+            </div>
+            <div class="widget-slider">
+              <svg class="ico ico-sm"><use href="#i-fan"/></svg>
+              <input id="set-fan" class="range" type="range" min="0" max="5" value="2" aria-label="Fan speed" />
+              <span id="set-fan-val" class="range-val">2</span>
+            </div>
+            <div class="field">
+              <label for="set-airflow">Airflow mode</label>
+              <select id="set-airflow" class="select">
+                <option value="face">Face</option>
+                <option value="feet">Feet</option>
+                <option value="face-feet">Face + feet</option>
+                <option value="defrost">Windshield defrost</option>
+              </select>
+            </div>
+            <label class="switch-row"><span>Air recirculation</span><input type="checkbox" id="set-recirc" class="switch" checked /></label>
+            <div class="field">
+              <label for="set-seat-heat">Seat heating <span class="fineprint">(0 = off)</span></label>
+              <input id="set-seat-heat" class="range" type="range" min="0" max="3" value="0" aria-label="Seat heating level" />
+            </div>
+            <div class="field">
+              <label for="set-seat-vent">Seat ventilation <span class="fineprint">(0 = off)</span></label>
+              <input id="set-seat-vent" class="range" type="range" min="0" max="3" value="0" aria-label="Seat ventilation level" />
+            </div>
+          </section>
+
+          <section class="set-card">
+            <header class="card-head"><h3><svg class="ico"><use href="#i-brightness"/></svg> Display &amp; theme</h3></header>
+            <div class="widget-slider">
+              <svg class="ico ico-sm"><use href="#i-brightness"/></svg>
+              <input id="set-brightness" class="range" type="range" min="30" max="130" value="100" aria-label="Display brightness" />
+              <span id="set-brightness-val" class="range-val">100</span>
+            </div>
+            <div class="field">
+              <label for="set-theme">Theme</label>
+              <select id="set-theme" class="select">
+                <option value="dark">Night (matte black)</option>
+                <option value="day">Day (light)</option>
+                <option value="auto">Auto (follow system)</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="set-ambient">Ambient lighting colour</label>
+              <input id="set-ambient" type="color" value="#38e0d0" class="color-input" />
+            </div>
+            <label class="switch-row"><span>Interface sounds</span><input type="checkbox" id="set-sounds" class="switch" checked /></label>
+            <label class="switch-row"><span>Reduced motion</span><input type="checkbox" id="set-reduced-motion" class="switch" /></label>
+            <label class="switch-row"><span>Show camera feed in diagnostics (off = tracking runs invisibly in the background)</span><input type="checkbox" id="set-cam-preview" class="switch" /></label>
+          </section>
+
+          <section class="set-card">
+            <header class="card-head"><h3><svg class="ico"><use href="#i-hand"/></svg> Gesture tuning</h3></header>
+            <div class="widget-slider">
+              <span class="slider-ico-text">Sensitivity</span>
+              <input id="set-sensitivity" class="range" type="range" min="1" max="10" value="6" aria-label="Gesture sensitivity" />
+              <span id="set-sensitivity-val" class="range-val">6</span>
+            </div>
+            <div class="widget-slider">
+              <span class="slider-ico-text">Pointer speed</span>
+              <input id="set-pointer-speed" class="range" type="range" min="50" max="200" value="100" aria-label="Pointer speed" />
+              <span id="set-pointer-speed-val" class="range-val">100%</span>
+            </div>
+            <div class="widget-slider">
+              <span class="slider-ico-text">Smoothing</span>
+              <input id="set-smoothing" class="range" type="range" min="0" max="95" value="65" aria-label="Pointer smoothing" />
+              <span id="set-smoothing-val" class="range-val">65</span>
+            </div>
+            <div class="widget-slider">
+              <span class="slider-ico-text">Hold dwell</span>
+              <input id="set-dwell" class="range" type="range" min="400" max="2000" step="100" value="900" aria-label="Hold gesture dwell time" />
+              <span id="set-dwell-val" class="range-val">900ms</span>
+            </div>
+            <div class="btn-row">
+              <button class="btn btn-primary btn-sm" id="btn-open-gesture" type="button"><svg class="ico ico-sm"><use href="#i-camera"/></svg> Gesture controls</button>
+              <button class="btn btn-ghost btn-sm" id="btn-open-tutorial" type="button">Tutorial &amp; practice</button>
+            </div>
+          </section>
+
+          <section class="set-card">
+            <header class="card-head"><h3><svg class="ico"><use href="#i-grid"/></svg> Dashboard &amp; demo</h3></header>
+            <p class="fineprint">Choose which widgets appear on Home.</p>
+            <div class="widget-toggles">
+              <label class="check-row"><input type="checkbox" class="widget-toggle" data-widget="clock" checked /> Clock</label>
+              <label class="check-row"><input type="checkbox" class="widget-toggle" data-widget="music" checked /> Music</label>
+              <label class="check-row"><input type="checkbox" class="widget-toggle" data-widget="map" checked /> Map</label>
+              <label class="check-row"><input type="checkbox" class="widget-toggle" data-widget="phone" checked /> Phone</label>
+              <label class="check-row"><input type="checkbox" class="widget-toggle" data-widget="controls" checked /> Quick controls</label>
+              <label class="check-row"><input type="checkbox" class="widget-toggle" data-widget="climate" checked /> Climate</label>
+              <label class="check-row"><input type="checkbox" class="widget-toggle" data-widget="status" checked /> Status</label>
+            </div>
+            <div class="btn-row" style="margin-top:12px">
+              <button class="btn btn-ghost btn-sm" id="btn-demo-start" type="button">Start demo mode</button>
+              <button class="btn btn-ghost btn-sm" id="btn-demo-stop" type="button" disabled>Stop demo mode</button>
+            </div>
+            <div class="danger-zone">
+              <p class="fineprint">Reset all locally stored settings, call history, saved places and widget choices.</p>
+              <button class="btn btn-danger btn-sm" id="btn-reset-all" type="button"><svg class="ico ico-sm"><use href="#i-trash"/></svg> Reset all data &amp; settings</button>
+            </div>
+          </section>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- ================= BOTTOM DOCK ================= -->
+    <nav class="dock" aria-label="Primary">
+      <button class="dock-btn active" type="button" data-nav="home" aria-current="page">
+        <svg class="ico ico-lg"><use href="#i-home"/></svg><span>Home</span>
+      </button>
+      <button class="dock-btn" type="button" data-nav="media">
+        <svg class="ico ico-lg"><use href="#i-media"/></svg><span>Media</span>
+      </button>
+      <button class="dock-btn" type="button" data-nav="nav">
+        <svg class="ico ico-lg"><use href="#i-nav"/></svg><span>Navigation</span>
+      </button>
+      <button class="dock-btn" type="button" data-nav="phone">
+        <svg class="ico ico-lg"><use href="#i-phone"/></svg><span>Phone</span>
+      </button>
+    </nav>
+
+    <!-- ================= DRAWERS ================= -->
+
+    <!-- Quick settings -->
+    <div id="quick-panel" class="drawer" role="dialog" aria-modal="false" aria-labelledby="quick-title" hidden>
+      <header class="drawer-head">
+        <h2 id="quick-title"><svg class="ico"><use href="#i-gauge"/></svg> Quick controls</h2>
+        <button class="iconbtn" type="button" data-close="quick-panel" aria-label="Close quick controls"><svg class="ico"><use href="#i-close"/></svg></button>
+      </header>
+      <div class="drawer-body">
+        <div class="widget-slider">
+          <svg class="ico ico-sm"><use href="#i-volume"/></svg>
+          <input id="quick-volume" class="range" type="range" min="0" max="100" value="60" aria-label="Volume" />
+          <span id="quick-volume-val" class="range-val">60</span>
+        </div>
+        <div class="widget-slider">
+          <svg class="ico ico-sm"><use href="#i-brightness"/></svg>
+          <input id="quick-brightness" class="range" type="range" min="30" max="130" value="100" aria-label="Brightness" />
+          <span id="quick-brightness-val" class="range-val">100</span>
+        </div>
+        <label class="switch-row"><span>Gesture control</span><input type="checkbox" id="quick-gesture-toggle" class="switch" /></label>
+        <label class="switch-row"><span>Gesture lock <svg class="ico ico-sm"><use href="#i-lock"/></svg></span><input type="checkbox" id="quick-lock-toggle" class="switch" /></label>
+        <label class="switch-row"><span>Air conditioning</span><input type="checkbox" id="quick-ac-toggle" class="switch" /></label>
+        <label class="switch-row"><span>Interface sounds</span><input type="checkbox" id="quick-sounds-toggle" class="switch" checked /></label>
+        <div class="btn-row" style="margin-top:14px">
+          <button class="btn btn-ghost btn-sm" type="button" data-nav-to="settings">All settings</button>
+          <button class="btn btn-ghost btn-sm" type="button" id="quick-theme-btn">Toggle day/night</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Notifications -->
+    <div id="notif-panel" class="drawer" role="dialog" aria-modal="false" aria-labelledby="notif-title" hidden>
+      <header class="drawer-head">
+        <h2 id="notif-title"><svg class="ico"><use href="#i-bell"/></svg> Notifications</h2>
+        <div class="drawer-head-actions">
+          <button class="btn btn-ghost btn-sm" id="btn-clear-notifs" type="button">Clear all</button>
+          <button class="iconbtn" type="button" data-close="notif-panel" aria-label="Close notifications"><svg class="ico"><use href="#i-close"/></svg></button>
+        </div>
+      </header>
+      <div class="drawer-body">
+        <ul id="notif-list" class="notif-list"></ul>
+        <p id="notif-empty" class="empty-inline">No notifications.</p>
+      </div>
+    </div>
+
+    <!-- Diagnostics -->
+    <div id="diag-panel" class="drawer" role="dialog" aria-modal="false" aria-labelledby="diag-title" hidden>
+      <header class="drawer-head">
+        <h2 id="diag-title"><svg class="ico"><use href="#i-gauge"/></svg> Tracking diagnostics</h2>
+        <button class="iconbtn" type="button" data-close="diag-panel" aria-label="Close diagnostics"><svg class="ico"><use href="#i-close"/></svg></button>
+      </header>
+      <div class="drawer-body">
+        <div class="diag-grid">
+          <div class="diag-cell"><span class="diag-k">Camera</span><span id="diag-cam" class="diag-v">Off</span></div>
+          <div class="diag-cell"><span class="diag-k">Model</span><span id="diag-model" class="diag-v">Not loaded</span></div>
+          <div class="diag-cell"><span class="diag-k">Hand</span><span id="diag-hand" class="diag-v">—</span></div>
+          <div class="diag-cell"><span class="diag-k">Gesture</span><span id="diag-gesture" class="diag-v">—</span></div>
+          <div class="diag-cell"><span class="diag-k">Confidence</span><span id="diag-conf" class="diag-v">—</span></div>
+          <div class="diag-cell"><span class="diag-k">FPS</span><span id="diag-fps" class="diag-v">0</span></div>
+          <div class="diag-cell"><span class="diag-k">Inference</span><span id="diag-infer" class="diag-v">— ms</span></div>
+          <div class="diag-cell"><span class="diag-k">Pointer</span><span id="diag-point" class="diag-v">—</span></div>
+          <div class="diag-cell"><span class="diag-k">Frame luma (OpenCV)</span><span id="diag-cv" class="diag-v">—</span></div>
+          <div class="diag-cell"><span class="diag-k">Lock</span><span id="diag-lock" class="diag-v">Unlocked</span></div>
+        </div>
+        <p id="diag-msg" class="nav-feedback" role="status" aria-live="polite"></p>
+        <div class="btn-row">
+          <button class="btn btn-primary btn-sm" id="btn-start-gesture" type="button">Start camera</button>
+          <button class="btn btn-ghost btn-sm" id="btn-stop-gesture" type="button" disabled>Stop camera</button>
+          <button class="btn btn-ghost btn-sm" id="btn-retry-model" type="button">Retry model</button>
+        </div>
+        <!-- Camera feed lives ONLY here (Gesture Lab) — never floats over the UI. -->
+        <div id="camera-preview" class="camera-preview" hidden>
+          <div class="cam-head"><svg class="ico ico-sm"><use href="#i-camera"/></svg> Camera feed <button class="iconbtn iconbtn-xs" id="btn-cam-hide" type="button" aria-label="Hide camera preview"><svg class="ico ico-sm"><use href="#i-close"/></svg></button></div>
+          <video id="camera-video" playsinline muted autoplay></video>
+          <div class="cam-foot"><span id="cam-hint">Show your hand to the camera</span></div>
+        </div>
+        <p class="fineprint">All inference runs locally in this tab. No video frames are uploaded anywhere.</p>
+      </div>
+    </div>
+
+    <!-- ================= MODALS ================= -->
+
+    <!-- Camera permission explainer -->
+    <div id="gesture-dialog" class="modal" role="dialog" aria-modal="true" aria-labelledby="gesture-dialog-title" hidden>
+      <div class="modal-card">
+        <div class="modal-ico"><svg class="ico ico-xl"><use href="#i-camera"/></svg></div>
+        <h2 id="gesture-dialog-title">Start gesture control?</h2>
+        <p>Your browser will ask for camera permission. Video is processed <strong>entirely on this device</strong> with MediaPipe hand tracking — frames are never uploaded, stored or sent to any service.</p>
+        <ul class="bullet-list">
+          <li>Index finger points, pinch to click.</li>
+          <li>Thumb up/down adjusts volume.</li>
+          <li>Hold a palm to pause, a fist to lock, three fingers for Home.</li>
+          <li>V sign on the Navigation screen starts voice control.</li>
+        </ul>
+        <div class="modal-actions">
+          <button class="btn btn-ghost" id="btn-gesture-cancel" type="button">Not now</button>
+          <button class="btn btn-primary" id="btn-gesture-start" type="button"><svg class="ico ico-sm"><use href="#i-camera"/></svg> Start camera</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tutorial / practice -->
+    <div id="tutorial-modal" class="modal modal-wide" role="dialog" aria-modal="true" aria-labelledby="tutorial-title" hidden>
+      <div class="modal-card">
+        <header class="modal-head">
+          <h2 id="tutorial-title"><svg class="ico"><use href="#i-hand"/></svg> Gesture tutorial</h2>
+          <button class="iconbtn" type="button" data-close="tutorial-modal" aria-label="Close tutorial"><svg class="ico"><use href="#i-close"/></svg></button>
+        </header>
+        <div class="gesture-cards" id="gesture-cards"><!-- populated from config --></div>
+        <div class="practice-box">
+          <div>
+            <h3>Practice mode</h3>
+            <p class="fineprint">Runs the tracker and shows what it sees — no actions are executed. Requires the camera.</p>
+          </div>
+          <div class="btn-row">
+            <button class="btn btn-primary btn-sm" id="btn-practice" type="button">Start practice</button>
+            <span id="practice-status" class="status-pill">Idle</span>
+          </div>
+          <ul id="practice-checklist" class="check-list"></ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- Incoming call overlay -->
+    <div id="incoming-overlay" class="call-overlay" role="dialog" aria-modal="true" aria-label="Incoming simulated call" hidden>
+      <div class="call-card">
+        <div class="sim-banner">SIMULATED CALL — no real network involved</div>
+        <div id="incoming-avatar" class="avatar avatar-xl">?</div>
+        <h2 id="incoming-name">Unknown</h2>
+        <p id="incoming-number" class="player-artist">—</p>
+        <p class="call-state">Incoming call… <span id="incoming-elapsed">0s</span></p>
+        <div class="gesture-hint"><svg class="ico ico-sm"><use href="#i-hand"/></svg> Thumb up to accept · thumb down to reject</div>
+        <div class="call-actions">
+          <button class="callbtn callbtn-reject" id="btn-reject" type="button" aria-label="Reject call">
+            <svg class="ico ico-lg"><use href="#i-callend"/></svg><span>Reject</span>
+          </button>
+          <button class="callbtn callbtn-accept" id="btn-accept" type="button" aria-label="Accept call">
+            <svg class="ico ico-lg"><use href="#i-call"/></svg><span>Accept</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Active call overlay -->
+    <div id="activecall-overlay" class="call-overlay call-overlay-dark" role="dialog" aria-modal="true" aria-label="Active simulated call" hidden>
+      <div class="call-card">
+        <div class="sim-banner">SIMULATED CALL</div>
+        <div id="active-avatar" class="avatar avatar-xl">?</div>
+        <h2 id="active-name">—</h2>
+        <p id="active-number" class="player-artist">—</p>
+        <p class="call-state">Call in progress · <span id="call-duration">0:00</span></p>
+        <div class="call-actions">
+          <button class="callbtn callbtn-ghost" id="btn-mute-call" type="button" aria-label="Mute microphone" aria-pressed="false">
+            <svg class="ico ico-lg"><use href="#i-mic"/></svg><span>Mute</span>
+          </button>
+          <button class="callbtn callbtn-reject" id="btn-end-call" type="button" aria-label="End call">
+            <svg class="ico ico-lg"><use href="#i-callend"/></svg><span>End</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Toasts -->
+    <div id="toast-host" class="toasts" aria-live="polite" aria-atomic="false"></div>
+
+    <!-- ================= GESTURE POINTER LAYER ================= -->
+    <canvas id="gesture-canvas" aria-hidden="true"></canvas>
+    <div id="no-hand-hint" class="no-hand-hint" hidden><svg class="ico"><use href="#i-hand"/></svg> No hand detected — hold one hand up to the camera</div>
+
+  </div>
+
+  <script type="module" src="./js/main.js"></script>
+</body>
+</html>
